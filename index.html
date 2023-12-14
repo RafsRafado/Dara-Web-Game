@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jogo Dara</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="login-container">
+    <!-- Logotipo -->
+    <header>
+        <img src="logo.png" alt="Logotipo do Jogo" class="logo">
+    </header>
+    <h2>Login to Play</h2>
+    <form id="login-form">
+        <label for="username"></label><input type="text" id="username" placeholder="Username" required>
+        <label for="password"></label><input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+<div class="waiting-page" id="waiting-page" style="display: none;">
+    <div class="waiting-content">
+        <h2>Waiting for Opponent...</h2>
+        <div class="loader" style="margin: auto"></div>
+        <button id="cancel-waiting" class="button-style">Cancel</button>
+    </div>
+</div>
+
+<div class="menu-container" style="display: none;">
+    <h2 id="welcome-text">Welcome, <span id="user-name"></span>!</h2>
+    <button type="button" id="start-game">Start Game</button>
+    <button type="button" id="open-configuracoes">Configurações</button>
+    <div class="buttons">
+        <button type="button" id="open-classificacoes">Classificações</button>
+        <button type="button" id="open-instrucoes">Instruções</button>
+    </div>
+
+</div>
+
+<div class="game">
+    <!-- Menssagem Fases -->
+    <div id="message-container">
+        <p id="message-fase">Fase de Colocação - Coloque suas peças.</p>
+    </div>
+
+
+
+    <!-- Desistir -->
+    <section id="mensagem-vitoria" class="mensagem" style="display: none;">
+        <div class="mensagem-conteudo">
+            <p id="mensagem-texto">O jogador venceu!</p>
+            <button id="fechar-mensagem">Fechar</button>
+        </div>
+    </section>
+
+
+    <!-- Tabuleiro -->
+    <section id="tabuleiro">
+        <h2>Tabuleiro</h2>
+        <span id="message"></span>
+        <span id="game-mode" class="gamemode"></span>
+
+        <!-- Add labels for the piece count -->
+        <div id="piece-count">
+            <span style="font-weight:bold;" for="black-count">Black Pieces: </span>
+            <span id="black-count"></span>
+            <span style="font-weight:bold;" for="white-count">White Pieces: </span>
+            <span id="white-count"></span>
+        </div>
+        <div id="board-container" class="board-container">
+            <div id="board"></div>
+        </div>
+    </section>
+
+    <div class="buttons">
+        <button type="button" id="reset-button">Reiniciar Jogo</button>
+        <button type="button" id="back-menu">Voltar ao Menu</button>
+    </div>
+
+</div>
+<section id="instrucoes-fullscreen" class="overlay-instrucoes" style="display: none;">
+    <div class="panel">
+        <h2 id="instrucoes-header">Instruções</h2>
+        <div id="instrucoes-content" class="scrollable-content">
+        </div>
+        <button id="close-instrucoes">Fechar Instruções</button>
+    </div>
+</section>
+<!-- Classificações -->
+<section id="classificacoes-fullscreen" class="overlay-classificacoes">
+    <div class="panel">
+        <div id="classificacoes-div">
+            <table id="classificacoes-tabela">
+                <thead>
+                <tr>
+                    <th>Modo de Jogo</th>
+                    <th>Vencedor</th>
+                    <th>Tipo de Jogador</th>
+                </tr>
+                </thead>
+                <tbody id="classificacoes-tbody">
+                </tbody>
+            </table>
+        </div>
+        <button id="fechar-classificacoes">Fechar Classificações</button>
+    </div>
+</section>
+<section id="configuracoes-fullscreen" class="overlay-configuracoes">
+    <div class="panel">
+        <h2>Configurações</h2>
+        <form id="config-form">
+            <label for="linhas-tabuleiro">Número de Linhas:</label>
+            <input type="number" id="linhas-tabuleiro" name="linhas-tabuleiro" min="2" max="20" value="6">
+
+            <br>
+
+            <label for="colunas-tabuleiro">Número de Colunas:</label>
+            <input type="number" id="colunas-tabuleiro" name="colunas-tabuleiro" min="2" max="20" value="5">
+
+            <br>
+
+            <span for="modo-jogo">Modo de Jogo:</span>
+            <input type="radio" id="modo-jogador-vs-computador" name="modo-jogo" value="jogador-vs-computador" checked>
+            <label for="modo-jogador-vs-computador">Jogador vs. Computador</label>
+            <input type="radio" id="modo-jogador-vs-jogador" name="modo-jogo" value="jogador-vs-jogador">
+            <label for="modo-jogador-vs-jogador">Jogador vs. Jogador</label>
+
+            <br>
+
+            <label for="primeiro-jogador">Primeiro Jogador:</label>
+            <select id="primeiro-jogador" name="primeiro-jogador">
+                <option value="jogador1">Jogador Preto</option>
+                <option value="jogador2">Jogador Branco</option>
+            </select>
+
+            <br>
+
+            <label for="nivel-ia">Nível da Inteligência Artificial:</label>
+            <select id="nivel-ia" name="nivel-ia">
+                <option value="facil">Fácil</option>
+                <option value="medio">Médio</option>
+                <option value="dificil">Difícil</option>
+            </select>
+
+            <br>
+        </form>
+        <button type="button" id="apply-settings">Aplicar Configurações</button>
+        <button type="button" id="close-configuracoes">Fechar Configurações</button>
+    </div>
+</section>
+
+
+<script src="communication.js"></script>
+<script src="script.js"></script>
+<script src="instrucoes.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

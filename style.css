@@ -1,0 +1,443 @@
+/* Styles for the game container */
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header styling */
+header {
+    padding: 10px;
+    text-align: right;
+}
+
+header img {
+    width: 80px;
+}
+
+/* Styling for the game sections */
+section {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 10px;
+    font-size: 20px;
+}
+
+h2 {
+    color: #007bff;
+    font-size: 24px;
+}
+
+/* Styling for buttons */
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Styling for links */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Styling for the board */
+#board {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    grid-gap: 2px;
+    background-color: #e0e0e0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.board-container {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cell {
+    width: 50px;
+    height: 50px;
+    background-color: rgb(124, 118, 118);
+    border: 5px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+
+}
+
+
+.cell.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Style for black pieces */
+.black-piece {
+    background-color: #000;
+    color: #fff;
+}
+
+/* Style for white pieces */
+.white-piece {
+    background-color: #fff;
+    color: #000;
+}
+
+/* Styling for the piece count labels */
+#piece-count {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+/* Styling for the messaging label */
+#message {
+    margin-top: 10px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction:row;
+}
+
+.buttons button {
+    margin-right: 20px;
+}
+
+.gamemode {
+    font-size: 24px; /* Aumenta o tamanho do texto */
+    float: right;
+    font-weight: bold;
+}
+
+.mensagem {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+.mensagem-conteudo {
+    background-color: white;
+    padding: 80px;
+    text-align: center;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    font-size: 50px;
+}
+
+
+#fechar-mensagem {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 30px 50px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 30px;
+}
+
+
+#message-container {
+    background-color: #333; /* Cor de fundo da mensagem */
+    color: #fff; /* Cor do texto da mensagem */
+    padding: 10px;
+    text-align: center;
+    display: none; /* Inicialmente, oculte a mensagem */
+}
+
+#message-fase{
+    margin-top: 10px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.overlay-classificacoes, .overlay-instrucoes, .overlay-configuracoes {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 3;
+    overflow-y: scroll;
+}
+
+.panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    min-width: 300px;
+}
+
+/* Style for the selected piece */
+.cell.selected {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Style for empty adjacent cells (highlighted cells) */
+.empty-adjacent {
+    background-color: #64FF33; /* You can change this color to your preference */
+    color: red; /* Change text color to improve visibility */
+}
+
+.removable-piece {
+    background-color: #FF3333; /* You can change this color to your preference */
+    color: #fff; /* Change text color to improve visibility */
+}
+
+.scrollable-content {
+    max-height: 60vh; /* Adjust the maximum height as needed */
+    overflow-y: auto;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100000px;
+    height: 1000px;
+    background-color: #fff;
+    border: 1px solid #721414;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.login-container h2 {
+    margin-bottom: 20px;
+    color: #007bff;
+    font-size: 36px;
+}
+
+.login-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-container input {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.login-container button {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* General table styles */
+#classificacoes-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: 'Arial', sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Table header styles */
+#classificacoes-tabela thead {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+#classificacoes-tabela thead th {
+    padding: 10px;
+    text-align: left;
+}
+
+/* Table body styles */
+#classificacoes-tabela tbody td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #dddddd;
+}
+
+/* Row styling */
+#classificacoes-tabela tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#classificacoes-tabela tbody tr:hover {
+    background-color: #ddd;
+}
+
+/* Winner color styling */
+#classificacoes-tabela .black {
+    color: #000000;
+}
+
+#classificacoes-tabela .white {
+    color: #FFFFFF;
+}
+
+/* Add some padding and a max-width to the container for better layout */
+#classificacoes-div {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+}
+
+/* Responsive table */
+@media screen and (max-width: 600px) {
+    #classificacoes-tabela thead {
+        display: none;
+    }
+
+    #classificacoes-tabela, #classificacoes-tabela tbody, #classificacoes-tabela tr, #classificacoes-tabela td {
+        display: block;
+        width: 100%;
+    }
+
+    #classificacoes-tabela tr {
+        margin-bottom: 15px;
+    }
+
+    #classificacoes-tabela td {
+        text-align: right;
+        padding-left: 50%;
+        text-align: right;
+        position: relative;
+    }
+
+    #classificacoes-tabela td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 50%;
+        padding-left: 15px;
+        font-weight: bold;
+        text-align: left;
+    }
+}
+
+
+.logo {
+    width: 400px;
+    height: auto;
+    position: absolute;
+    top: 230px; /* Distance from the top */
+    left: 50%; /* Center the logo horizontally */
+    transform: translateX(-50%); /* Center horizontally */
+}
+
+/* Menu Container Styling */
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+/* Menu Welcome Message */
+.menu-container h2 {
+    color: #007bff;
+    font-size: 28px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Menu Buttons */
+.menu-container button {
+    padding: 15px 30px;
+    margin: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Hover effect for menu buttons */
+.menu-container button:hover {
+    background-color: #0056b3;
+    color: #ffffff;
+}
+
+.waiting-page {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+}
+
+.waiting-content {
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
