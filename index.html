@@ -37,7 +37,7 @@
 
 </div>
 
-<div class="game">
+<div class="game" style="display: none;">
     <!-- Menssagem Fases -->
     <div id="message-container">
         <p id="message-fase">Fase de Colocação - Coloque suas peças.</p>
@@ -74,7 +74,8 @@
 
     <div class="buttons">
         <button type="button" id="reset-button">Reiniciar Jogo</button>
-        <button type="button" id="back-menu">Voltar ao Menu</button>
+        <button type="button" id="forfeit-button" style="background-color:red">Desistir</button>
+        <button type="button" id="back-button" style="display: none">Voltar ao menu</button>
     </div>
 
 </div>
@@ -158,5 +159,7 @@
 <script src="script.js"></script>
 <script src="instrucoes.js"></script>
 <script src="game.js"></script>
+<script src="gameapi.js"></script>
+
 </body>
 </html>

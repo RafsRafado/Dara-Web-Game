@@ -59,10 +59,8 @@ document.getElementById('login-form').addEventListener('submit', async function 
     const isAuthenticated = await checkCredentials(username, password); // Wait for the Promise to resolve
 
     if (isAuthenticated) {
-        document.querySelector('.login-container').style.display = 'none';
-        document.querySelector('.game').style.display = 'none';
+        changeScreen('.login-container','.menu-container');
         document.getElementById('welcome-text').textContent = 'Welcome ' + username + '!';
-        document.querySelector('.menu-container').style.display = 'block';
 
     } else {
         alert('Invalid username or password. Please try again.');
@@ -71,14 +69,26 @@ document.getElementById('login-form').addEventListener('submit', async function 
 
 const startGameButton = document.getElementById('start-game');
 startGameButton.addEventListener('click', async function () {
-    await lookForGame();
+    if(modoJogoSelect.value==="modo-jogador-vs-computador") {
+        initGame();
+        changeScreen('.menu-container','.game');
+    } else await lookForGame();
 });
 
-const backMenuButton = document.getElementById('back-menu');
-backMenuButton.addEventListener('click', function () {
-    document.querySelector('.game').style.display = 'none';
-    document.querySelector('.menu-container').style.display = 'block';
+const forfeitButton = document.getElementById('forfeit-button');
+forfeitButton.addEventListener('click', async function () {
+    var confirmQuit = confirm("Queres mesmo desistir do jogo?");
+    if (confirmQuit) {
+        await leaveGame();
+        changeScreen('.game','.menu-container');
+    }
 });
+
+const backButton = document.getElementById('back-button');
+backButton.addEventListener('click',function () {
+    changeScreen('.game','.menu-container');
+});
+
 
 const modoJogoSelect = document.getElementById('modo-jogo');
 modoJogoSelect.addEventListener('change', function () {
@@ -87,9 +97,14 @@ modoJogoSelect.addEventListener('change', function () {
     } else {
         document.getElementById("hidePvP").style.display = 'none';
     }
-})
+});
 
 
 function checkCredentials() {
     return registerUser();
+}
+
+function changeScreen(from,to){
+    document.querySelector(from).style.display = 'none';
+    document.querySelector(to).style.display = 'block';
 }

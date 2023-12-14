@@ -46,8 +46,7 @@ async function lookForGame() {
     if ("game" in response_json) {
         console.log("Sucessfuly joined a game with ID: "+ response_json.game);
         game = response_json.game;
-        document.querySelector('.waiting-page').style.display = "block";
-        document.querySelector('.menu-container').style.display = 'none';
+        changeScreen('.menu-container','.waiting-page');
         await update();
     }
     else{
@@ -56,14 +55,15 @@ async function lookForGame() {
     }
 }
 
-const cancelWaiting = document.getElementById('cancel-waiting');
-cancelWaiting.addEventListener('click',async function () {
-    let nick = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
+async function leaveGame() {
     let response_json = await callServer("leave", {group, nick, password, game});
     console.log(response_json);
-    document.querySelector('.waiting-page').style.display = 'none';
-    document.querySelector('.menu-container').style.display = 'block';
+}
+
+const cancelWaiting = document.getElementById('cancel-waiting');
+cancelWaiting.addEventListener('click',async function () {
+    await leaveGame();
+    changeScreen('.waiting-page','.menu-container');
 })
 
 async function update() {
@@ -78,8 +78,10 @@ async function update() {
 
             if (data.winner) {
                 console.log(`The game has ended and player ${data.winner} won`);
+                document.getElementById('forfeit-button').style.display='none';
+                document.getElementById('back-button').style.display='block';
                 eventSource.close();
-            } else {
+            } else if(data.board) {
                 updateGameStatus(data);
             }
         };
@@ -94,17 +96,16 @@ async function update() {
 }
 
 function updateGameStatus(data) {
-    const { board, phase, step, turn } = data;
+    if(document.querySelector('.game').style.display==='none'){
+        initGame();
+        changeScreen('.waiting-page','.game');
+        startGameFromAPI(data);
+    } else{
+        updateGameFromAPI(data);
+    }
 }
 
 
 async function notify(row, column){
-    let response_json = await callServer("notify", {nick, password, game, "move":{row,column}});
-    if ("error" in response_json){
-        console.log("Notify error. Response:");
-        console.log(response_json);
-    }
-    else{
-        console.log("Successfuly notified the server");
-    }
+    return await callServer("notify", {nick, password, game, "move": {"row": row, "column": column}});
 }

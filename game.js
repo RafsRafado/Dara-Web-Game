@@ -65,8 +65,8 @@ function createBoard(rows, cols) {
 function initGame() {
     rows = parseInt(document.getElementById('linhas-tabuleiro').value);
     cols = parseInt(document.getElementById('colunas-tabuleiro').value);
-    gameMode = document.querySelector('input[name="modo-jogo"]:checked').value;
-    document.getElementById('game-mode').textContent = gameMode;
+    gameMode = document.getElementById('modo-jogo').textContent;
+    document.getElementById('game-mode').value = gameMode;
     currentPlayerColor = document.getElementById('primeiro-jogador').value === 'jogador1' ? 'black' : 'white';
     initialPlayerColor = currentPlayerColor;
     computerColor = getOppositeColor(currentPlayerColor);
