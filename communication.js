@@ -1,8 +1,8 @@
 const SERVER = "http://twserver.alunos.dcc.fc.up.pt:8008/";
 const group = 25;
-var game = 0;
-var nick;
-var password;
+let game = 0;
+let nick;
+let password;
 
 function getInputValue(id) {
     return document.getElementById(id).value;
@@ -100,6 +100,10 @@ function updateGameStatus(data) {
         initGame();
         changeScreen('.waiting-page','.game');
         startGameFromAPI(data);
+        updatePlayerTurn(data.turn);
+        updateGamePhase(data.phase);
+        board = data.board;
+        currentPlayerColor=data.players[nick];
     } else{
         updateGameFromAPI(data);
     }

@@ -41,12 +41,12 @@ function clearBoard() {
     for (let row = 0; row < rows; row++) {
         board[row] = [];
         for (let col = 0; col < cols; col++) {
-            board[row][col] = null;
+            board[row][col] = "empty";
         }
     }
 }
 
-function createBoard(rows, cols) {
+function createBoard(rows, cols,func) {
     const boardElement = document.getElementById('board');
     boardElement.style.gridTemplateColumns = `repeat(${cols}, 50px)`;
     for (let row = 0; row < rows; row++) {
@@ -58,7 +58,7 @@ function createBoard(rows, cols) {
             boardElement.appendChild(cellElement);
         }
     }
-    boardElement.addEventListener('click', cellClick);
+    boardElement.addEventListener('click', func);
     updateLabels();
 }
 
@@ -97,14 +97,14 @@ function updateLabels() {
 }
 function placePiece(row, col, cell) {
     if (!isPlacementPhase) {
-        return;
+        return false;
     }
     if (hasThreeInRowOrColumn(row, col)) {
         alert('Movimento proibido. Colocar a peça nesta posição forma uma sequência de 4 peças');
-        return;
+        return false;
     }
-    if (cell.classList.contains('black-piece') || cell.classList.contains('white-piece')) {
-        return;
+    if (board[row][col]!=="empty") {
+        return false;
     }
     if ((currentPlayerColor === 'black' && pieceCounts.black < maxPieceCount) ||
         (currentPlayerColor === 'white' && pieceCounts.white < maxPieceCount)) {
@@ -123,6 +123,7 @@ function placePiece(row, col, cell) {
             setMessageContainer('Todas as peças foram colocadas! - Fase de Movimentação');
         }
     }
+    return true;
 }
 
 function movePiece(row, col, cell) {
@@ -147,7 +148,7 @@ function removePiece(row, col, color) {
     const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
     if(cell.classList.contains(`removable-piece`)) {
         cell.classList.remove(`${color}-piece`);
-        board[row][col] = null;
+        board[row][col] = "empty";
         isRemovePiecePhase = false;
         pieceRemoved[color] += 1;
         clearHighlightedRemovablePieces();
@@ -251,7 +252,7 @@ function canMovePiece(row, col) {
 
 function moveSelectedPiece(row, col, cell) {
     board[row][col] = currentPlayerColor;
-    board[selectedPiece.row][selectedPiece.col] = null;
+    board[selectedPiece.row][selectedPiece.col] = "empty";
     const selectedCell = document.querySelector('.cell.selected');
     selectedCell.classList.remove('selected', `${currentPlayerColor.toLowerCase()}-piece`);
     cell.classList.add(`${currentPlayerColor.toLowerCase()}-piece`);
@@ -395,7 +396,7 @@ async function handleComputerMove() {
 
 function highlightEmptyAdjacent(row, col) {
     const newboard = cloneBoard();
-    board[row][col] = null;
+    board[row][col] = "empty";
     const offsets = [
         { row: -1, col: 0 },
         { row: 1, col: 0 },
@@ -411,7 +412,7 @@ function highlightEmptyAdjacent(row, col) {
         if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) {
             continue;
         }
-        if (board[newRow][newCol] || hasThreeInRowOrColumn(newRow, newCol)) {
+        if (board[newRow][newCol]!=="empty" || hasThreeInRowOrColumn(newRow, newCol)) {
             continue;
         }
         const cell = document.querySelector(`.cell[data-row='${newRow}'][data-col='${newCol}']`);

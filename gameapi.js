@@ -1,3 +1,4 @@
+let turn;
 function startGameFromAPI(response) {
     initGameFromAPI(response.board);
 }
@@ -5,12 +6,12 @@ function startGameFromAPI(response) {
 function initGameFromAPI(boardData) {
     const rows = boardData.length;
     const cols = boardData[0].length;
-    document.getElementById('back-button').style.display='none';
-    document.getElementById('reset-button').style.display='none';
-    document.getElementById('forfeit-button').style.display='block';
+    document.getElementById('back-button').style.display = 'none';
+    document.getElementById('reset-button').style.display = 'none';
+    document.getElementById('forfeit-button').style.display = 'block';
     clearBoard();
 
-    createBoard(rows, cols);
+    createBoard(rows, cols,playTurnFromAPI);
 
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
@@ -34,9 +35,9 @@ function clearBoard() {
         boardElement.removeChild(boardElement.firstChild);
     }
 
-    pieceCounts = { black: 0, white: 0 };
-    pieceRemoved = { black: 0, white: 0 };
-    previousMove = { black: { row: -1, col: -1 }, white: { row: -1, col: -1 } };
+    pieceCounts = {black: 0, white: 0};
+    pieceRemoved = {black: 0, white: 0};
+    previousMove = {black: {row: -1, col: -1}, white: {row: -1, col: -1}};
     selectedPiece = null;
     winner = null;
 
@@ -46,6 +47,13 @@ function clearBoard() {
     boardElement.style.gridTemplateRows = '';
 
     updateLabels();
+    board = [];
+    for (let row = 0; row < rows; row++) {
+        board[row] = [];
+        for (let col = 0; col < cols; col++) {
+            board[row][col] = null;
+        }
+    }
 }
 
 function updateLabels() {
@@ -53,21 +61,6 @@ function updateLabels() {
     const whiteCountLabel = document.getElementById('white-count');
     blackCountLabel.textContent = '0';
     whiteCountLabel.textContent = '0';
-}
-
-function createBoard(rows, cols) {
-    const boardElement = document.getElementById('board');
-    boardElement.style.gridTemplateColumns = `repeat(${cols}, 50px)`;
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            const cellElement = document.createElement('div');
-            cellElement.classList.add('cell');
-            cellElement.dataset.row = row.toString();
-            cellElement.dataset.col = col.toString();
-            boardElement.appendChild(cellElement);
-        }
-    }
-    boardElement.addEventListener('click', playTurnFromAPI);
 }
 
 
@@ -92,7 +85,10 @@ function updatePieceCount(boardData) {
 }
 
 function updateGameFromAPI(data) {
+    updateGamePhase(data.phase);
+    currentPlayerColor=data.players[nick]
     if (data.board) {
+        board = data.board;
         for (let row = 0; row < data.board.length; row++) {
             for (let col = 0; col < data.board[row].length; col++) {
                 const cellValue = data.board[row][col];
@@ -110,10 +106,6 @@ function updateGameFromAPI(data) {
 
     updatePieceCount(data.board);
 
-    if (data.phase) {
-        updateGamePhase(data.phase);
-    }
-
     if (data.turn) {
         updatePlayerTurn(data.turn);
     }
@@ -123,15 +115,16 @@ function updateGameFromAPI(data) {
 }
 
 function updateGamePhase(phase) {
-    isPlacementPhase = (phase === 'placement');
-    isMovementPhase = (phase === 'movement');
-    isRemovePiecePhase = (phase === 'remove');
+    isPlacementPhase = (phase === 'drop');
+    isMovementPhase = (phase === 'move');
 }
 
-function updatePlayerTurn(turn) {
-    currentPlayerColor = turn;
+function updatePlayerTurn(pTurn) {
+    turn = pTurn;
     const messageLabel = document.getElementById('message');
-    messageLabel.textContent = `Turno do jogador ${turn}`;
+    if(nick===turn){
+        messageLabel.textContent = `É a sua vez de jogar`;
+    }else messageLabel.textContent = `Turno do jogador ${turn}`;
 }
 
 function handleGameOver(winner) {
@@ -146,16 +139,31 @@ async function playTurnFromAPI(event) {
     }
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
-    try {
-        const response = await notify(row, col);
+    if(turn===nick){
+        try {
+            let response;
+            if(isPlacementPhase){
+                if(placePiece(row,col,cell)) response = await notify(row, col);
+                else return;
+            } else if(isRemovePiecePhase){
+                removePiece(row,col,board[row][col]);
+                response = await notify(row, col);
+            }
+            else if(isMovementPhase){
+                movePiece(row,col,cell);
+                response = await notify(row, col);
+            } else return;
 
-        if (response.error) {
-            console.error('Erro ao realizar jogada: ', response.error);
-        } else {
-            console.log('Jogada realizada com sucesso.');
+            if (response.error) {
+                console.error('Erro ao realizar jogada: ', response.error);
+            } else {
+                console.log('Jogada realizada com sucesso.');
+            }
+        } catch (error) {
+            console.error('Erro ao tentar enviar a jogada para a API: ', error);
         }
-    } catch (error) {
-        console.error('Erro ao tentar enviar a jogada para a API: ', error);
+    } else{
+        alert("Not your turn to play.")
     }
 }
 
