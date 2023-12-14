@@ -75,10 +75,20 @@ startGameButton.addEventListener('click', async function () {
 });
 
 const backMenuButton = document.getElementById('back-menu');
-backMenuButton.addEventListener('click',function (){
+backMenuButton.addEventListener('click', function () {
     document.querySelector('.game').style.display = 'none';
     document.querySelector('.menu-container').style.display = 'block';
+});
+
+const modoJogoSelect = document.getElementById('modo-jogo');
+modoJogoSelect.addEventListener('change', function () {
+    if (modoJogoSelect.value === "modo-jogador-vs-computador") {
+        document.getElementById("hidePvP").style.display = 'block';
+    } else {
+        document.getElementById("hidePvP").style.display = 'none';
+    }
 })
+
 
 function checkCredentials() {
     return registerUser();

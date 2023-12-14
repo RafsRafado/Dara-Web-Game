@@ -1,6 +1,8 @@
 const SERVER = "http://twserver.alunos.dcc.fc.up.pt:8008/";
 const group = 25;
 var game = 0;
+var nick;
+var password;
 
 function getInputValue(id) {
     return document.getElementById(id).value;
@@ -24,8 +26,8 @@ async function callServer(endpoint, data) {
 }
 
 async function registerUser() {
-    const nick = getInputValue("username");
-    const password = getInputValue("password");
+    nick = getInputValue("username");
+    password = getInputValue("password");
     const response = await callServer("register", { nick, password });
 
     if (!response.error) {
@@ -38,8 +40,6 @@ async function registerUser() {
 }
 
 async function lookForGame() {
-    let nick = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
     let rowsInput = parseInt(document.getElementById('linhas-tabuleiro').value);
     let colsInput = parseInt(document.getElementById('colunas-tabuleiro').value);
     let response_json = await callServer("join", {group, nick, password, "size":{"rows":rowsInput,"columns":colsInput}});
@@ -48,7 +48,7 @@ async function lookForGame() {
         game = response_json.game;
         document.querySelector('.waiting-page').style.display = "block";
         document.querySelector('.menu-container').style.display = 'none';
-        update();
+        await update();
     }
     else{
         console.log("Join failed. Response:");
@@ -67,14 +67,13 @@ cancelWaiting.addEventListener('click',async function () {
 })
 
 async function update() {
-    const nick = document.getElementById("username").value;
     const url = `${SERVER}update?nick=${encodeURIComponent(nick)}&game=${encodeURIComponent(game)}`;
     let data;
     try {
         const eventSource = new EventSource(url);
 
         eventSource.onmessage = function(message) {
-            console.log("Successfully received an update from the server");
+            console.log("Successfully received an update from the server with data: " + message.data);
             data = JSON.parse(message.data);
 
             if (data.winner) {
@@ -100,8 +99,6 @@ function updateGameStatus(data) {
 
 
 async function notify(row, column){
-    let nick = document.getElementById("username-input").value;
-    let password = document.getElementById("password-input").value;
     let response_json = await callServer("notify", {nick, password, game, "move":{row,column}});
     if ("error" in response_json){
         console.log("Notify error. Response:");

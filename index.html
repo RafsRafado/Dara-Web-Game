@@ -32,10 +32,8 @@
     <h2 id="welcome-text">Welcome, <span id="user-name"></span>!</h2>
     <button type="button" id="start-game">Start Game</button>
     <button type="button" id="open-configuracoes">Configurações</button>
-    <div class="buttons">
-        <button type="button" id="open-classificacoes">Classificações</button>
-        <button type="button" id="open-instrucoes">Instruções</button>
-    </div>
+    <button type="button" id="open-classificacoes">Classificações</button>
+    <button type="button" id="open-instrucoes">Instruções</button>
 
 </div>
 
@@ -109,45 +107,49 @@
 </section>
 <section id="configuracoes-fullscreen" class="overlay-configuracoes">
     <div class="panel">
-        <h2>Configurações</h2>
-        <form id="config-form">
-            <label for="linhas-tabuleiro">Número de Linhas:</label>
-            <input type="number" id="linhas-tabuleiro" name="linhas-tabuleiro" min="2" max="20" value="6">
+        <div>
+            <h2>Configurações</h2>
+            <form id="config-form">
+                <label for="linhas-tabuleiro">Número de Linhas:</label>
+                <input type="number" id="linhas-tabuleiro" name="linhas-tabuleiro" min="2" max="20" value="6">
 
-            <br>
+                <br>
 
-            <label for="colunas-tabuleiro">Número de Colunas:</label>
-            <input type="number" id="colunas-tabuleiro" name="colunas-tabuleiro" min="2" max="20" value="5">
+                <label for="colunas-tabuleiro">Número de Colunas:</label>
+                <input type="number" id="colunas-tabuleiro" name="colunas-tabuleiro" min="2" max="20" value="5">
 
-            <br>
+                <br>
 
-            <span for="modo-jogo">Modo de Jogo:</span>
-            <input type="radio" id="modo-jogador-vs-computador" name="modo-jogo" value="jogador-vs-computador" checked>
-            <label for="modo-jogador-vs-computador">Jogador vs. Computador</label>
-            <input type="radio" id="modo-jogador-vs-jogador" name="modo-jogo" value="jogador-vs-jogador">
-            <label for="modo-jogador-vs-jogador">Jogador vs. Jogador</label>
+                <label for="modo-jogo">Modo de Jogo:</label>
+                <br><select id="modo-jogo" name="modo-jogo">
+                    <option value="modo-jogador-vs-jogador">Jogador vs. Jogador</option>
+                    <option value="modo-jogador-vs-computador">Jogador vs. Computador</option>
+                </select>
 
-            <br>
+                <br>
+                <div id="hidePvP" style="margin: 0;display: none">
+                    <label for="primeiro-jogador">Primeiro Jogador:</label>
+                    <br>
+                    <select id="primeiro-jogador" name="primeiro-jogador">
+                        <option value="jogador1">Jogador Preto</option>
+                        <option value="jogador2">Jogador Branco</option>
+                    </select>
+                    <br>
+                    <label for="nivel-ia">Nível da Inteligência Artificial:</label>
+                    <select id="nivel-ia" name="nivel-ia">
+                        <option value="facil">Fácil</option>
+                        <option value="medio">Médio</option>
+                        <option value="dificil">Difícil</option>
+                    </select>
+                </div>
 
-            <label for="primeiro-jogador">Primeiro Jogador:</label>
-            <select id="primeiro-jogador" name="primeiro-jogador">
-                <option value="jogador1">Jogador Preto</option>
-                <option value="jogador2">Jogador Branco</option>
-            </select>
+                <br>
 
-            <br>
-
-            <label for="nivel-ia">Nível da Inteligência Artificial:</label>
-            <select id="nivel-ia" name="nivel-ia">
-                <option value="facil">Fácil</option>
-                <option value="medio">Médio</option>
-                <option value="dificil">Difícil</option>
-            </select>
-
-            <br>
-        </form>
-        <button type="button" id="apply-settings">Aplicar Configurações</button>
-        <button type="button" id="close-configuracoes">Fechar Configurações</button>
+                <br>
+            </form>
+            <button type="button" id="apply-settings">Aplicar Configurações</button>
+            <button type="button" id="close-configuracoes">Fechar Configurações</button>
+        </div>
     </div>
 </section>
 
