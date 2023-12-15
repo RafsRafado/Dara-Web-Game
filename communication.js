@@ -30,7 +30,7 @@ async function registerUser() {
     password = getInputValue("password");
     const response = await callServer("register", { nick, password });
 
-    if (!response.error) {
+    if (!response["error"]) {
         console.log("Registration successful");
         return true;
     } else {
@@ -73,16 +73,16 @@ async function update() {
         const eventSource = new EventSource(url);
 
         eventSource.onmessage = function(message) {
-            console.log("Successfully received an update from the server with data: " + message.data);
-            data = JSON.parse(message.data);
+            console.log("Successfully received an update from the server with data: " + message["data"]);
+            data = JSON.parse(message["data"]);
 
-            if (data.winner) {
-                console.log(`The game has ended and player ${data.winner} won`);
-                handleGameOver(data.winner);
+            if (data["winner"]) {
+                console.log(`The game has ended and player ${data["winner"]} won`);
+                handleGameOver(data["winner"]);
                 document.getElementById('forfeit-button').style.display='none';
                 document.getElementById('back-button').style.display='block';
                 eventSource.close();
-            } else if(data.board) {
+            } else if(data["board"]) {
                 updateGameStatus(data);
             }
         };
@@ -100,8 +100,10 @@ function updateGameStatus(data) {
     if(document.querySelector('.game').style.display==='none'){
         changeScreen('.waiting-page','.game');
         startGameFromAPI(data);
-        board = data.board;
-        currentPlayerColor=data.players[nick];
+        board = data["board"];
+        currentPlayerColor=data["players"][nick];
+        initialPlayerColor=currentPlayerColor;
+        console.log(currentPlayerColor);
     } else{
         updateGameFromAPI(data);
     }

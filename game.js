@@ -76,10 +76,9 @@ function initGame() {
 }
 
 function startGameFromAPI(response) {
-    initialPlayerColor = response.players[nick];
-    updatePlayerTurn(response.turn);
-    updateGamePhase(response.phase);
-    initGameFromAPI(response.board);
+    updatePlayerTurn(response["turn"]);
+    updateGamePhase(response["phase"]);
+    initGameFromAPI(response["board"]);
 }
 
 function initGameFromAPI(boardData) {
@@ -129,13 +128,13 @@ function updatePieceCount(boardData) {
 }
 
 function updateGameFromAPI(data) {
-    updateGamePhase(data.phase);
-    currentPlayerColor=data.players[nick];
-    if (data.board) {
-        board = data.board;
-        for (let row = 0; row < data.board.length; row++) {
-            for (let col = 0; col < data.board[row].length; col++) {
-                const cellValue = data.board[row][col];
+    updateGamePhase(data["phase"]);
+    currentPlayerColor=data["players"][nick];
+    if (data["board"]) {
+        board = data["board"];
+        for (let row = 0; row < board.length; row++) {
+            for (let col = 0; col < board[row].length; col++) {
+                const cellValue = board[row][col];
                 const cellElement = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
                 cellElement.classList.remove('black-piece', 'white-piece');
 
@@ -148,10 +147,10 @@ function updateGameFromAPI(data) {
         }
     }
 
-    updatePieceCount(data.board);
+    updatePieceCount(data["board"]);
 
     if (data.turn) {
-        updatePlayerTurn(data.turn);
+        updatePlayerTurn(data["turn"]);
     }
 }
 
@@ -183,7 +182,6 @@ function resetGame() {
 
 function updateLabels() {
     if(gameMode==="modo-jogador-vs-computador"){
-        console.log("aaa");
         const messageLabel = document.getElementById('message');
         const blackCountLabel = document.getElementById('black-count');
         const whiteCountLabel = document.getElementById('white-count');

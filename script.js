@@ -1,49 +1,42 @@
-// Event listener para abrir o painel de classificações
 const verClassificacoesButton1 = document.getElementById('open-classificacoes');
 verClassificacoesButton1.addEventListener('click', function () {
     document.querySelector(".overlay-classificacoes").style.display = "block";
-    document.body.style.overflow = 'hidden'; // Impede a rolagem da página
+    document.body.style.overflow = 'hidden';
 });
 
-// Event listener para fechar o painel de classificações
 const fecharClassificacoesButton = document.getElementById('fechar-classificacoes');
 fecharClassificacoesButton.addEventListener('click', function () {
     document.querySelector(".overlay-classificacoes").style.display = "none";
-    document.body.style.overflow = "auto"; // Re-enable scrolling
+    document.body.style.overflow = "auto";
 });
 
-// Event listener para abrir as instruções
 const verInstrucoesButton = document.getElementById('open-instrucoes');
 verInstrucoesButton.addEventListener('click', function () {
     document.querySelector(".overlay-instrucoes").style.display = "block";
-    document.body.style.overflow = 'hidden'; // Impede a rolagem da página
+    document.body.style.overflow = 'hidden'; 
 });
 
 
-// Event listener para fechar o painel de instruções
 const fecharInstrucoesButton = document.getElementById('close-instrucoes');
 fecharInstrucoesButton.addEventListener('click', function () {
     document.querySelector(".overlay-instrucoes").style.display = "none";
-    document.body.style.overflow = "auto"; // Re-enable scrolling
+    document.body.style.overflow = "auto";
 });
 
-// Event listener para abrir as instruções
 const verConfiguracoesButton = document.getElementById('open-configuracoes');
 verConfiguracoesButton.addEventListener('click', function () {
     document.querySelector(".overlay-configuracoes").style.display = "block";
-    document.body.style.overflow = 'hidden'; // Impede a rolagem da página
+    document.body.style.overflow = 'hidden'; 
 });
 
 
-// Event listener para fechar o painel de instruções
 const fecharConfiguracoesButton = document.getElementById('close-configuracoes');
 fecharConfiguracoesButton.addEventListener('click', function () {
     document.querySelector(".overlay-configuracoes").style.display = "none";
-    document.body.style.overflow = "auto"; // Re-enable scrolling
+    document.body.style.overflow = "auto";
 });
 
 
-// Event listener para o botão "Fechar Mensagem"
 const fecharMensagemButton = document.getElementById('fechar-mensagem');
 fecharMensagemButton.addEventListener('click', function () {
     const mensagemVitoria = document.getElementById('mensagem-vitoria');
@@ -56,7 +49,7 @@ document.getElementById('login-form').addEventListener('submit', async function 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    const isAuthenticated = await checkCredentials(username, password); // Wait for the Promise to resolve
+    const isAuthenticated = await checkCredentials(username, password);
 
     if (isAuthenticated) {
         changeScreen('.login-container','.menu-container');
@@ -77,7 +70,7 @@ startGameButton.addEventListener('click', async function () {
 
 const forfeitButton = document.getElementById('forfeit-button');
 forfeitButton.addEventListener('click', async function () {
-    var confirmQuit = confirm("Queres mesmo desistir do jogo?");
+    const confirmQuit = confirm("Confirmar desistência");
     if (confirmQuit) {
         await leaveGame();
         changeScreen('.game','.menu-container');
@@ -91,13 +84,10 @@ backButton.addEventListener('click',function () {
 
 
 const modoJogoSelect = document.getElementById('modo-jogo');
-modoJogoSelect.addEventListener('change', function () {
-    if (modoJogoSelect.value === "modo-jogador-vs-computador") {
-        document.getElementById("hidePvP").style.display = 'block';
-    } else {
-        document.getElementById("hidePvP").style.display = 'none';
-    }
-});
+modoJogoSelect.addEventListener('change', toggleGameMode);
+
+const logOutButton = document.getElementById('logout');
+logOutButton.addEventListener('click',function(){changeScreen('.menu-container','.login-container')});
 
 
 function checkCredentials() {
@@ -107,4 +97,13 @@ function checkCredentials() {
 function changeScreen(from,to){
     document.querySelector(from).style.display = 'none';
     document.querySelector(to).style.display = 'block';
+}
+
+function toggleGameMode(){
+    if (modoJogoSelect.value === "modo-jogador-vs-computador") {
+        document.getElementById("hidePvP").style.display = 'block';
+    } else {
+        document.getElementById("hidePvP").style.display = 'none';
+    }
+
 }

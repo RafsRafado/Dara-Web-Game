@@ -208,12 +208,24 @@ a:hover {
     min-width: 300px;
 }
 
-input, select, button {
+.menu-container button {
     border-radius: 5px; /* Bordas arredondadas */
     border: 1px solid #ddd;
     padding: 10px;
     margin-bottom: 10px;
     width: 100%;
+}
+
+#config-form select,#config-form button {
+    border-radius: 5px; /* Bordas arredondadas */
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+#config-form input{
+    padding:10px;
 }
 
 .panel input {
@@ -263,8 +275,9 @@ button:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100000px;
-    height: 1000px;
+    width: auto; /* Adjust as needed */
+    max-width: 400px; /* Adjust as needed */
+    height: auto; /* Adjust as needed */
     background-color: #fff;
     border: 1px solid #721414;
     border-radius: 10px;
@@ -273,26 +286,24 @@ button:hover {
     z-index: 1;
 }
 
-.login-container h2 {
-    margin-bottom: 20px;
-    color: #007bff;
-    font-size: 36px;
-}
 
 .login-container form {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.login-container input {
-    padding: 10px;
+.login-input {
+    width: 70%;
     margin: 5px;
+    padding: 15px;
     border-radius: 5px;
     border: 1px solid #ddd;
 }
 
 .login-container button {
+    width: 60%;
     padding: 10px 20px;
     margin: 10px;
     border: none;
@@ -388,13 +399,12 @@ button:hover {
 
 
 .logo {
-    width: 400px;
+    width: 400px; /* Adjust as per your requirement */
     height: auto;
-    position: absolute;
-    top: 230px; /* Distance from the top */
-    left: 50%; /* Center the logo horizontally */
-    transform: translateX(-50%); /* Center horizontally */
+    display: flex;
+    z-index: 2; /* Ensure it's above other elements */
 }
+
 
 /* Menu Container Styling */
 .menu-container {
@@ -415,20 +425,18 @@ button:hover {
     z-index: 1;
 }
 
-/* Menu Welcome Message */
-.menu-container h2 {
+/* Menu Buttons */
+.button-menu {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.h2menu{
     color: #007bff;
     font-size: 28px;
     margin-bottom: 20px;
     text-align: center;
-}
-
-/* Menu Buttons */
-.menu-container button {
-    padding: 15px 30px;
-    margin: 10px;
-    font-size: 18px;
-    font-weight: bold;
 }
 
 /* Hover effect for menu buttons */
