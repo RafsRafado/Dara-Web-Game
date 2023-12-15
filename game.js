@@ -14,6 +14,7 @@ let rows = 0;
 let cols = 0;
 let winner = null;
 let gameMode;
+let turn;
 
 window.onload = function () {
     initGame();
@@ -65,37 +66,137 @@ function createBoard(rows, cols,func) {
 function initGame() {
     rows = parseInt(document.getElementById('linhas-tabuleiro').value);
     cols = parseInt(document.getElementById('colunas-tabuleiro').value);
-    gameMode = document.getElementById('modo-jogo').textContent;
+    gameMode = document.getElementById('modo-jogo').value;
     document.getElementById('game-mode').value = gameMode;
     currentPlayerColor = document.getElementById('primeiro-jogador').value === 'jogador1' ? 'black' : 'white';
     initialPlayerColor = currentPlayerColor;
     computerColor = getOppositeColor(currentPlayerColor);
     clearBoard();
-    createBoard(rows, cols);
+    createBoard(rows, cols,cellClick);
+}
+
+function startGameFromAPI(response) {
+    initialPlayerColor = response.players[nick];
+    updatePlayerTurn(response.turn);
+    updateGamePhase(response.phase);
+    initGameFromAPI(response.board);
+}
+
+function initGameFromAPI(boardData) {
+    const rows = boardData.length;
+    const cols = boardData[0].length;
+    document.getElementById('back-button').style.display = 'none';
+    document.getElementById('reset-button').style.display = 'none';
+    document.getElementById('forfeit-button').style.display = 'block';
+    clearBoard();
+
+    createBoard(rows, cols,cellClick);
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+            const piece = boardData[row][col];
+            cell.classList.remove('black-piece', 'white-piece');
+
+            if (piece === 'black') {
+                cell.classList.add('black-piece');
+            } else if (piece === 'white') {
+                cell.classList.add('white-piece');
+            }
+        }
+    }
+    updatePieceCount(boardData);
+}
+
+function updatePieceCount(boardData) {
+    let blackCount = 0;
+    let whiteCount = 0;
+
+    for (let row of boardData) {
+        for (let cell of row) {
+            if (cell === 'black') {
+                blackCount++;
+            } else if (cell === 'white') {
+                whiteCount++;
+            }
+        }
+    }
+
+    const blackCountLabel = document.getElementById('black-count');
+    const whiteCountLabel = document.getElementById('white-count');
+    blackCountLabel.textContent = blackCount.toString();
+    whiteCountLabel.textContent = whiteCount.toString();
+}
+
+function updateGameFromAPI(data) {
+    updateGamePhase(data.phase);
+    currentPlayerColor=data.players[nick];
+    if (data.board) {
+        board = data.board;
+        for (let row = 0; row < data.board.length; row++) {
+            for (let col = 0; col < data.board[row].length; col++) {
+                const cellValue = data.board[row][col];
+                const cellElement = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                cellElement.classList.remove('black-piece', 'white-piece');
+
+                if (cellValue === 'black') {
+                    cellElement.classList.add('black-piece');
+                } else if (cellValue === 'white') {
+                    cellElement.classList.add('white-piece');
+                }
+            }
+        }
+    }
+
+    updatePieceCount(data.board);
+
+    if (data.turn) {
+        updatePlayerTurn(data.turn);
+    }
+}
+
+function handleGameOver(winner) {
+    alert(`Game Over! Winner: ${winner}`);
+}
+
+function updateGamePhase(phase) {
+    isPlacementPhase = (phase === 'drop');
+    isMovementPhase = (phase === 'move');
+}
+
+function updatePlayerTurn(pTurn) {
+    turn = pTurn;
+    const messageLabel = document.getElementById('message');
+    if(nick===turn){
+        messageLabel.textContent = `É a sua vez de jogar`;
+    }else messageLabel.textContent = `Turno do jogador ${turn}`;
 }
 
 function resetGame() {
     if (confirm('Deseja reiniciar o jogo? Todo o progresso será perdido!')) {
         currentPlayerColor = initialPlayerColor;
         clearBoard();
-        createBoard(rows, cols);
+        createBoard(rows, cols,cellClick);
         winner = null;
     }
 }
 
 function updateLabels() {
-    const messageLabel = document.getElementById('message');
-    const blackCountLabel = document.getElementById('black-count');
-    const whiteCountLabel = document.getElementById('white-count');
-
-    messageLabel.textContent = `Player ${currentPlayerColor === 'black' ? 'Black' : 'White'}'s Turn`;
-    if (isRemovePiecePhase) {
-        messageLabel.textContent = `Player ${currentPlayerColor === 'black' ? 'Black' : 'White'}'s Turn - Remove a piece`;
+    if(gameMode==="modo-jogador-vs-computador"){
+        console.log("aaa");
+        const messageLabel = document.getElementById('message');
+        const blackCountLabel = document.getElementById('black-count');
+        const whiteCountLabel = document.getElementById('white-count');
+        blackCountLabel.textContent = (maxPieceCount - pieceCounts.black).toString();
+        whiteCountLabel.textContent = (maxPieceCount - pieceCounts.white).toString();
+        messageLabel.textContent = `Player ${currentPlayerColor === 'black' ? 'Black' : 'White'}'s Turn`;
+        if (isRemovePiecePhase) {
+            messageLabel.textContent = `Player ${currentPlayerColor === 'black' ? 'Black' : 'White'}'s Turn - Remove a piece`;
+        }
     }
-    blackCountLabel.textContent = (maxPieceCount - pieceCounts.black).toString();
-    whiteCountLabel.textContent = (maxPieceCount - pieceCounts.white).toString();
+
 }
-function placePiece(row, col, cell) {
+async function placePiece(row, col, cell) {
     if (!isPlacementPhase) {
         return false;
     }
@@ -107,7 +208,11 @@ function placePiece(row, col, cell) {
         return false;
     }
     if ((currentPlayerColor === 'black' && pieceCounts.black < maxPieceCount) ||
-        (currentPlayerColor === 'white' && pieceCounts.white < maxPieceCount)) {
+        (currentPlayerColor === 'white' && pieceCounts.white < maxPieceCount)
+        || nick===turn && gameMode!=="modo-jogador-vs-computador") {
+        if(gameMode!=="modo-jogador-vs-computador"){
+            await notify(parseInt(row),parseInt(col));
+        }
         board[row][col] = currentPlayerColor;
         cell.classList.add(`${currentPlayerColor}-piece`);
         if (currentPlayerColor === 'black') {
@@ -115,18 +220,21 @@ function placePiece(row, col, cell) {
         } else {
             pieceCounts.white++;
         }
-        switchPlayer();
+        if(gameMode==="modo-jogador-vs-computador") switchPlayer();
         updateLabels();
         if (pieceCounts.black === maxPieceCount && pieceCounts.white === maxPieceCount) {
             isPlacementPhase = false;
             isMovementPhase = true;
             setMessageContainer('Todas as peças foram colocadas! - Fase de Movimentação');
         }
+    } else {
+        console.log("currentPlayerColor " + currentPlayerColor);
+        console.log ("pieceCounts.black " + pieceCounts.black);
+        console.log("maxPieceCount " + maxPieceCount);
     }
-    return true;
 }
 
-function movePiece(row, col, cell) {
+async function movePiece(row, col, cell) {
     switch (true) {
         case !isMovementPhase:
             return;
@@ -134,25 +242,28 @@ function movePiece(row, col, cell) {
             alert('Movimento proibido. Por favor, seleciona uma das suas peças.');
             break;
         case cell.classList.contains(`${currentPlayerColor}-piece`):
-            selectPiece(row, col, cell);
+            await selectPiece(row, col, cell);
             break;
         case selectedPiece && canMovePiece(row, col):
-            moveSelectedPiece(row, col, cell);
+            await moveSelectedPiece(row, col, cell);
             break;
         default:
             alert('Movimento proibido. Por favor, seleciona uma das células com a cor verde.');
     }
 }
 
-function removePiece(row, col, color) {
+async function removePiece(row, col, color) {
     const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
     if(cell.classList.contains(`removable-piece`)) {
+        if(gameMode!=="modo-jogador-vs-computador"){
+            await notify(parseInt(row),parseInt(col));
+        }
         cell.classList.remove(`${color}-piece`);
         board[row][col] = "empty";
         isRemovePiecePhase = false;
         pieceRemoved[color] += 1;
         clearHighlightedRemovablePieces();
-        if(isGameOver()) {
+        if(gameMode==="modo-jogador-vs-computador" && isGameOver()) {
             isMovementPhase = false;
             isPlacementPhase = false;
             isRemovePiecePhase = false;
@@ -206,7 +317,7 @@ function addClassificationToHTML(winnerColor, gameMode) {
 function hasAvailableMoves(playerColor) {
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-                if (!board[row][col] && isAdjacentToPieceOfColor(row, col, playerColor)) {
+                if (board[row][col]==="empty" && isAdjacentToPieceOfColor(row, col, playerColor)) {
                     return true;
                 }
         }
@@ -225,7 +336,7 @@ function isAdjacentToPieceOfColor(row, col, color) {
     }
 }
 
-function selectPiece(row, col, cell) {
+async function selectPiece(row, col, cell) {
     let currentPiece = board[row][col];
     if (currentPiece === currentPlayerColor) {
         if (selectedPiece) {
@@ -250,19 +361,23 @@ function canMovePiece(row, col) {
     return cell.classList.contains('empty-adjacent');
 }
 
-function moveSelectedPiece(row, col, cell) {
+async function moveSelectedPiece(row, col, cell) {
     board[row][col] = currentPlayerColor;
     board[selectedPiece.row][selectedPiece.col] = "empty";
     const selectedCell = document.querySelector('.cell.selected');
     selectedCell.classList.remove('selected', `${currentPlayerColor.toLowerCase()}-piece`);
     cell.classList.add(`${currentPlayerColor.toLowerCase()}-piece`);
     previousMove[currentPlayerColor] = { row: selectedPiece.row, col: selectedPiece.col };
+    if(gameMode!=="modo-jogador-vs-computador") {
+        await notify(parseInt(selectedPiece.row),parseInt(selectedPiece.col));
+        await notify(parseInt(row),parseInt(col));
+    }
     selectedPiece = null;
     if (hasXInARowOrColumn(row, col, 3)) {
         isRemovePiecePhase = true;
         highlightRemovablePieces(getOppositeColor(currentPlayerColor));
     } else {
-        switchPlayer();
+        if(gameMode==="modo-jogador-vs-computador") switchPlayer();
     }
     clearHighlightedEmptyAdjacent();
     updateLabels();
@@ -273,7 +388,9 @@ function getOppositeColor(color) {
 }
 
 function switchPlayer() {
-    currentPlayerColor = getOppositeColor(currentPlayerColor);
+    if(gameMode==="modo-jogador-vs-computador"){
+        currentPlayerColor = getOppositeColor(currentPlayerColor);
+    }
 }
 
 
@@ -291,7 +408,7 @@ const RobotPlayer = {
 
             await new Promise(r => setTimeout(r, 300));
             const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-            placePiece(row, col, cell);
+            await placePiece(row, col, cell);
         }
     },
     makeMove: async function(board) {
@@ -302,7 +419,7 @@ const RobotPlayer = {
             const row = cell.dataset.row;
             const col = cell.dataset.col;
             if (board[row][col] === currentPlayerColor) {
-                selectPiece(row, col, cell);
+                await selectPiece(row, col, cell);
                 const availableMoves = boardElement.querySelectorAll('.cell.empty-adjacent');
                 await new Promise(r => setTimeout(r, 300));
 
@@ -310,7 +427,7 @@ const RobotPlayer = {
                     const randomIndex = Math.floor(Math.random() * availableMoves.length);
                     const randomCell = availableMoves[randomIndex];
                     const { row, col } = randomCell.dataset;
-                    moveSelectedPiece(row, col, randomCell);
+                    await moveSelectedPiece(row, col, randomCell);
 
                     if (isRemovePiecePhase) {
                         await new Promise(r => setTimeout(r, 800));
@@ -332,7 +449,7 @@ const RobotPlayer = {
             const col = randomCell.dataset.col;
 
             await new Promise(r => setTimeout(r, 800));
-            removePiece(row, col, getOppositeColor(currentPlayerColor));
+            await removePiece(row, col, getOppositeColor(currentPlayerColor));
         }
     }
 };
@@ -349,7 +466,7 @@ function findEmptyCells(board) {
     const emptyCells = [];
     board.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
-            if (!cell) {
+            if (cell==="empty") {
                 emptyCells.push({ row: rowIndex, col: colIndex });
             }
         });
@@ -359,25 +476,29 @@ function findEmptyCells(board) {
 
 async function cellClick(event) {
     const cell = event.target;
-    if (cell.id === 'board' || cell.classList.contains('selected') || currentPlayerColor === computerColor && gameMode === "jogador-vs-computador") {
+    if (cell.id === 'board' || cell.classList.contains('selected') || currentPlayerColor === computerColor && gameMode === "modo-jogador-vs-computador") {
+        return;
+    } else if(turn!==nick && gameMode!=="modo-jogador-vs-computador"){
+        console.log(gameMode);
+        alert("Not your turn to play.");
         return;
     }
     const row = cell.dataset.row;
     const col = cell.dataset.col;
     switch (true) {
         case isRemovePiecePhase:
-            removePiece(row, col, getOppositeColor(currentPlayerColor));
+            await removePiece(row, col, getOppositeColor(initialPlayerColor));
             break;
         case isPlacementPhase:
-            placePiece(row, col, cell);
+            await placePiece(row, col, cell);
             break;
         case isMovementPhase:
-            movePiece(row, col, cell);
+            await movePiece(row, col, cell);
             break;
         default:
             break;
     }
-    if (currentPlayerColor === computerColor && gameMode === "jogador-vs-computador") {
+    if (currentPlayerColor === computerColor && gameMode === "modo-jogador-vs-computador") {
         await handleComputerMove();
     }
 }

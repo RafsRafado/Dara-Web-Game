@@ -78,6 +78,7 @@ async function update() {
 
             if (data.winner) {
                 console.log(`The game has ended and player ${data.winner} won`);
+                handleGameOver(data.winner);
                 document.getElementById('forfeit-button').style.display='none';
                 document.getElementById('back-button').style.display='block';
                 eventSource.close();
@@ -97,11 +98,8 @@ async function update() {
 
 function updateGameStatus(data) {
     if(document.querySelector('.game').style.display==='none'){
-        initGame();
         changeScreen('.waiting-page','.game');
         startGameFromAPI(data);
-        updatePlayerTurn(data.turn);
-        updateGamePhase(data.phase);
         board = data.board;
         currentPlayerColor=data.players[nick];
     } else{

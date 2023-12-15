@@ -1,34 +1,3 @@
-let turn;
-function startGameFromAPI(response) {
-    initGameFromAPI(response.board);
-}
-
-function initGameFromAPI(boardData) {
-    const rows = boardData.length;
-    const cols = boardData[0].length;
-    document.getElementById('back-button').style.display = 'none';
-    document.getElementById('reset-button').style.display = 'none';
-    document.getElementById('forfeit-button').style.display = 'block';
-    clearBoard();
-
-    createBoard(rows, cols,playTurnFromAPI);
-
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-            const piece = boardData[row][col];
-            cell.classList.remove('black-piece', 'white-piece');
-
-            if (piece === 'black') {
-                cell.classList.add('black-piece');
-            } else if (piece === 'white') {
-                cell.classList.add('white-piece');
-            }
-        }
-    }
-    updatePieceCount(boardData);
-}
-
 function clearBoard() {
     const boardElement = document.getElementById('board');
     while (boardElement.firstChild) {
@@ -64,72 +33,9 @@ function updateLabels() {
 }
 
 
-function updatePieceCount(boardData) {
-    let blackCount = 0;
-    let whiteCount = 0;
 
-    for (let row of boardData) {
-        for (let cell of row) {
-            if (cell === 'black') {
-                blackCount++;
-            } else if (cell === 'white') {
-                whiteCount++;
-            }
-        }
-    }
 
-    const blackCountLabel = document.getElementById('black-count');
-    const whiteCountLabel = document.getElementById('white-count');
-    blackCountLabel.textContent = blackCount.toString();
-    whiteCountLabel.textContent = whiteCount.toString();
-}
 
-function updateGameFromAPI(data) {
-    updateGamePhase(data.phase);
-    currentPlayerColor=data.players[nick]
-    if (data.board) {
-        board = data.board;
-        for (let row = 0; row < data.board.length; row++) {
-            for (let col = 0; col < data.board[row].length; col++) {
-                const cellValue = data.board[row][col];
-                const cellElement = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
-                cellElement.classList.remove('black-piece', 'white-piece');
-
-                if (cellValue === 'black') {
-                    cellElement.classList.add('black-piece');
-                } else if (cellValue === 'white') {
-                    cellElement.classList.add('white-piece');
-                }
-            }
-        }
-    }
-
-    updatePieceCount(data.board);
-
-    if (data.turn) {
-        updatePlayerTurn(data.turn);
-    }
-    if (data.winner) {
-        handleGameOver(data.winner);
-    }
-}
-
-function updateGamePhase(phase) {
-    isPlacementPhase = (phase === 'drop');
-    isMovementPhase = (phase === 'move');
-}
-
-function updatePlayerTurn(pTurn) {
-    turn = pTurn;
-    const messageLabel = document.getElementById('message');
-    if(nick===turn){
-        messageLabel.textContent = `É a sua vez de jogar`;
-    }else messageLabel.textContent = `Turno do jogador ${turn}`;
-}
-
-function handleGameOver(winner) {
-    alert(`Game Over! Winner: ${winner}`);
-}
 
 
 async function playTurnFromAPI(event) {
