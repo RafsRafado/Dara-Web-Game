@@ -1,4 +1,5 @@
-const SERVER = "http://twserver.alunos.dcc.fc.up.pt:8008/";
+//const SERVER = "http://twserver.alunos.dcc.fc.up.pt:8008/";
+const SERVER = "http://localhost:8008/";
 const group = 25;
 let game;
 let nick;
