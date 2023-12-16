@@ -1,6 +1,6 @@
 const SERVER = "http://twserver.alunos.dcc.fc.up.pt:8008/";
 const group = 25;
-let game = 0;
+let game;
 let nick;
 let password;
 
@@ -64,7 +64,42 @@ const cancelWaiting = document.getElementById('cancel-waiting');
 cancelWaiting.addEventListener('click',async function () {
     await leaveGame();
     changeScreen('.waiting-page','.menu-container');
-})
+});
+
+function insertRowInClassification(player){
+    const tableBody = document.getElementById('classificacoes-tbody');
+    const row = tableBody.insertRow();
+    const playerName = row.insertCell(0);
+    const gameNumber = row.insertCell(1);
+    const victoryNumber = row.insertCell(2);
+    const winRate = row.insertCell(3);
+
+    playerName.textContent = player["nick"];
+    gameNumber.textContent = player["games"];
+    victoryNumber.textContent = player["victories"];
+    winRate.textContent = ((player["victories"]/player["games"])*100).toFixed(2).toString() + "%";
+}
+
+function clearClassifications() {
+    const tableBody = document.getElementById('classificacoes-tbody');
+    tableBody.innerHTML = '';
+}
+
+async function ranking(){
+    let rows,cols;
+    rows = 6;
+    cols = 5;
+    let response_json = await callServer("ranking", {group, "size": {"rows":rows,"columns":cols}});
+    if (!("error" in response_json)){
+        console.log("Successfuly received the ranking table");
+        clearClassifications();
+        response_json["ranking"].forEach(row => insertRowInClassification(row));
+    }
+    else{
+        console.log("Ranking error. Response:");
+        console.log(response_json);
+    }
+}
 
 async function update() {
     const url = `${SERVER}update?nick=${encodeURIComponent(nick)}&game=${encodeURIComponent(game)}`;
@@ -103,7 +138,6 @@ function updateGameStatus(data) {
         board = data["board"];
         currentPlayerColor=data["players"][nick];
         initialPlayerColor=currentPlayerColor;
-        console.log(currentPlayerColor);
     } else{
         updateGameFromAPI(data);
     }

@@ -20,13 +20,6 @@ window.onload = function () {
     initGame();
 };
 
-const applySettingButton = document.getElementById('apply-settings');
-applySettingButton.addEventListener('click', initGame);
-
-const reiniciarJogoButton = document.getElementById('reset-button');
-reiniciarJogoButton.addEventListener('click', resetGame);
-
-
 function clearBoard() {
     const boardElement = document.getElementById('board');
     boardElement.innerHTML = '';
@@ -169,15 +162,6 @@ function updatePlayerTurn(pTurn) {
     if(nick===turn){
         messageLabel.textContent = `É a sua vez de jogar`;
     }else messageLabel.textContent = `Turno do jogador ${turn}`;
-}
-
-function resetGame() {
-    if (confirm('Deseja reiniciar o jogo? Todo o progresso será perdido!')) {
-        currentPlayerColor = initialPlayerColor;
-        clearBoard();
-        createBoard(rows, cols,cellClick);
-        winner = null;
-    }
 }
 
 function updateLabels() {

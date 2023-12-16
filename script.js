@@ -1,5 +1,6 @@
-const verClassificacoesButton1 = document.getElementById('open-classificacoes');
-verClassificacoesButton1.addEventListener('click', function () {
+const verClassificacoesButton = document.getElementById('open-classificacoes');
+verClassificacoesButton.addEventListener('click', async function () {
+    await ranking();
     document.querySelector(".overlay-classificacoes").style.display = "block";
     document.body.style.overflow = 'hidden';
 });
@@ -29,6 +30,13 @@ verConfiguracoesButton.addEventListener('click', function () {
     document.body.style.overflow = 'hidden'; 
 });
 
+const applySettingButton = document.getElementById('apply-settings');
+applySettingButton.addEventListener('click', function () {
+    initGame();
+    document.querySelector(".overlay-configuracoes").style.display = "none";
+    document.body.style.overflow = "auto";
+});
+
 
 const fecharConfiguracoesButton = document.getElementById('close-configuracoes');
 fecharConfiguracoesButton.addEventListener('click', function () {
@@ -52,9 +60,9 @@ document.getElementById('login-form').addEventListener('submit', async function 
     const isAuthenticated = await checkCredentials(username, password);
 
     if (isAuthenticated) {
-        changeScreen('.login-container','.menu-container');
         document.getElementById('welcome-text').textContent = 'Welcome ' + username + '!';
-
+        changeScreen('.login-container','.menu-container');
+        clearLoginDetails();
     } else {
         alert('Invalid username or password. Please try again.');
     }
@@ -105,5 +113,9 @@ function toggleGameMode(){
     } else {
         document.getElementById("hidePvP").style.display = 'none';
     }
+}
 
+function clearLoginDetails(){
+    document.getElementById("username").value="";
+    document.getElementById("password").value="";
 }
