@@ -34,7 +34,7 @@ class GameSession {
         if (!this.players[username]) {
             this.players[username] = color;
             if (this.isGameReady()) {
-                this.turn = Object.keys(this.players)[0]; // First player to join starts
+                this.turn = Object.keys(this.players)[0];
             }
         }
     }
@@ -141,8 +141,6 @@ function deleteGameSession(gameId) {
     if (gameSessions.hasOwnProperty(gameId)) {
         delete gameSessions[gameId];
         console.log(`Game session with ID ${gameId} has been deleted.`);
-    } else {
-        console.log(`No game session found with ID ${gameId}.`);
     }
 }
 
@@ -222,9 +220,6 @@ function handleRanking(request, response) {
     });
 }
 
-
-
-
 function findGameSession(rows, columns) {
     for (let gameId in gameSessions) {
         let session = gameSessions[gameId];
@@ -286,6 +281,8 @@ function processMove(gameSession, move) {
     if (gameSession.board[row][column] !== 'empty') {
         return { valid: false, message: "Cell is already occupied" };
     }
+    let pieceCount = gameSession.board.flat().filter(cell => cell !== 'empty').length;
+    if(pieceCount===24 && gameSession.phase==='drop') gameSession.phase = 'move';
     return { valid: true, message: "Valid move" };
 }
 
@@ -324,6 +321,7 @@ function handleGameLeave(request, response) {
             let winner = null;
             if (gameSession.isGameReady()) {
                 winner = Object.keys(gameSession.players).find(player => player !== username);
+                updatePlayerStats(winner,Object.keys(gameSession.players),25,gameSession.rows,gameSession.cols);
             }
 
             gameSession.notifyClients({ winner: winner });
@@ -384,11 +382,6 @@ function handleGameUpdate(request, response) {
     });
 }
 
-
-function getRankingTable(request, response) {
-    sendSuccessResponse(response, {message: "Ranking Table :)"});
-}
-
 const server = httpLib.createServer((request, response) => {
     if (request.method === 'OPTIONS') {
         response.writeHead(200, corsConfig);
@@ -399,9 +392,7 @@ const server = httpLib.createServer((request, response) => {
         handleGameJoin(request, response);
     } else if (request.method === 'POST' && request.url === '/leave') {
         handleGameLeave(request, response);
-    } else if (request.method === 'POST' && request.url === '/ranking') {
-        getRankingTable(request, response);
-    }if (request.method === 'POST' && request.url === '/notify'){
+    } else if (request.method === 'POST' && request.url === '/notify') {
       handleNotify(request,response);
     } else if (request.method === 'GET' && request.url.startsWith('/update')) {
         handleGameUpdate(request, response);
