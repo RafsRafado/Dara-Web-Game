@@ -3,9 +3,9 @@ let board;
 let currentPlayerColor;
 let initialPlayerColor;
 let computerColor;
-let pieceCounts = {black: 0,white: 0};
-let pieceRemoved = {black: 0,white: 0};
-let previousMove = {black: { row: -1, col: -1 } , white: { row: -1, col: -1 }};
+let pieceCounts = {black: 0, white: 0};
+let pieceRemoved = {black: 0, white: 0};
+let previousMove = {black: {row: -1, col: -1}, white: {row: -1, col: -1}};
 let isPlacementPhase;
 let isMovementPhase;
 let isRemovePiecePhase;
@@ -20,17 +20,26 @@ window.onload = function () {
     initGame();
 };
 
+function setErrorMessage(message) {
+    const messageLabel = document.getElementById('error-message');
+    messageLabel.textContent=message;
+}
+
+function clearErrorMessage(){
+    const messageLabel = document.getElementById('error-message');
+    messageLabel.textContent="";
+}
+
 function clearBoard() {
     const boardElement = document.getElementById('board');
     boardElement.innerHTML = '';
-    document.getElementById('message-container').style.display = 'none';
     isPlacementPhase = true;
     isMovementPhase = false;
     isRemovePiecePhase = false;
     selectedPiece = null;
-    pieceCounts = {black: 0,white: 0};
-    pieceRemoved = {black: 0,white: 0};
-    previousMove = {black: { row: -1, col: -1 } , white: { row: -1, col: -1 }};
+    pieceCounts = {black: 0, white: 0};
+    pieceRemoved = {black: 0, white: 0};
+    previousMove = {black: {row: -1, col: -1}, white: {row: -1, col: -1}};
     board = [];
     for (let row = 0; row < rows; row++) {
         board[row] = [];
@@ -40,7 +49,7 @@ function clearBoard() {
     }
 }
 
-function createBoard(rows, cols,func) {
+function createBoard(rows, cols, func) {
     const boardElement = document.getElementById('board');
     boardElement.style.gridTemplateColumns = `repeat(${cols}, 50px)`;
     for (let row = 0; row < rows; row++) {
@@ -65,10 +74,11 @@ function initGame() {
     initialPlayerColor = currentPlayerColor;
     computerColor = getOppositeColor(currentPlayerColor);
     clearBoard();
-    createBoard(rows, cols,cellClick);
+    createBoard(rows, cols, cellClick);
 }
 
 function startGameFromAPI(response) {
+    clearErrorMessage();
     updatePlayerTurn(response["turn"]);
     updateGamePhase(response["phase"]);
     initGameFromAPI(response["board"]);
@@ -82,7 +92,7 @@ function initGameFromAPI(boardData) {
     document.getElementById('forfeit-button').style.display = 'block';
     clearBoard();
 
-    createBoard(rows, cols,cellClick);
+    createBoard(rows, cols, cellClick);
 
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
@@ -121,8 +131,9 @@ function updatePieceCount(boardData) {
 }
 
 function updateGameFromAPI(data) {
+    clearErrorMessage();
     updateGamePhase(data["phase"]);
-    currentPlayerColor=data["players"][nick];
+    currentPlayerColor = data["players"][nick];
     if (data["board"]) {
         board = data["board"];
         for (let row = 0; row < board.length; row++) {
@@ -148,7 +159,7 @@ function updateGameFromAPI(data) {
 }
 
 function handleGameOver(winner) {
-    alert(`Game Over! Winner: ${winner}`);
+    setErrorMessage(`Game Over! Winner: ${winner}`);
 }
 
 function updateGamePhase(phase) {
@@ -159,13 +170,13 @@ function updateGamePhase(phase) {
 function updatePlayerTurn(pTurn) {
     turn = pTurn;
     const messageLabel = document.getElementById('message');
-    if(nick===turn){
+    if (nick === turn) {
         messageLabel.textContent = `É a sua vez de jogar`;
-    }else messageLabel.textContent = `Turno do jogador ${turn}`;
+    } else messageLabel.textContent = `Turno do jogador ${turn}`;
 }
 
 function updateLabels() {
-    if(gameMode==="modo-jogador-vs-computador"){
+    if (gameMode === "modo-jogador-vs-computador") {
         const messageLabel = document.getElementById('message');
         const blackCountLabel = document.getElementById('black-count');
         const whiteCountLabel = document.getElementById('white-count');
@@ -178,40 +189,40 @@ function updateLabels() {
     }
 
 }
+
 async function placePiece(row, col, cell) {
     if (!isPlacementPhase) {
         return false;
     }
     if (hasThreeInRowOrColumn(row, col)) {
-        alert('Movimento proibido. Colocar a peça nesta posição forma uma sequência de 4 peças');
+        setErrorMessage('Movimento proibido. Colocar a peça nesta posição forma uma sequência de 4 peças');
         return false;
     }
-    if (board[row][col]!=="empty") {
+    if (board[row][col] !== "empty") {
         return false;
     }
-    if ((currentPlayerColor === 'black' && pieceCounts.black < maxPieceCount) ||
-        (currentPlayerColor === 'white' && pieceCounts.white < maxPieceCount)
-        || nick===turn && gameMode!=="modo-jogador-vs-computador") {
-        if(gameMode!=="modo-jogador-vs-computador"){
-            await notify(parseInt(row),parseInt(col));
-        }
-        board[row][col] = currentPlayerColor;
-        cell.classList.add(`${currentPlayerColor}-piece`);
-        if (currentPlayerColor === 'black') {
-            pieceCounts.black++;
+    if ((currentPlayerColor === 'black' && pieceCounts.black < maxPieceCount) || (currentPlayerColor === 'white' && pieceCounts.white < maxPieceCount) || nick === turn && gameMode !== "modo-jogador-vs-computador") {
+        if (gameMode !== "modo-jogador-vs-computador") {
+            await notifyServer(parseInt(row), parseInt(col));
         } else {
-            pieceCounts.white++;
-        }
-        if(gameMode==="modo-jogador-vs-computador") switchPlayer();
-        updateLabels();
-        if (pieceCounts.black === maxPieceCount && pieceCounts.white === maxPieceCount) {
-            isPlacementPhase = false;
-            isMovementPhase = true;
-            setMessageContainer('Todas as peças foram colocadas! - Fase de Movimentação');
+            board[row][col] = currentPlayerColor;
+            cell.classList.add(`${currentPlayerColor}-piece`);
+            if (currentPlayerColor === 'black') {
+                pieceCounts.black++;
+            } else {
+                pieceCounts.white++;
+            }
+            if (gameMode === "modo-jogador-vs-computador") switchPlayer();
+            updateLabels();
+            if (pieceCounts.black === maxPieceCount && pieceCounts.white === maxPieceCount) {
+                isPlacementPhase = false;
+                isMovementPhase = true;
+                setErrorMessage('Todas as peças foram colocadas! - Fase de Movimentação');
+            }
         }
     } else {
         console.log("currentPlayerColor " + currentPlayerColor);
-        console.log ("pieceCounts.black " + pieceCounts.black);
+        console.log("pieceCounts.black " + pieceCounts.black);
         console.log("maxPieceCount " + maxPieceCount);
     }
 }
@@ -221,7 +232,7 @@ async function movePiece(row, col, cell) {
         case !isMovementPhase:
             return;
         case cell.classList.contains(`${getOppositeColor(currentPlayerColor)}-piece`):
-            alert('Movimento proibido. Por favor, seleciona uma das suas peças.');
+            setErrorMessage('Movimento proibido. Por favor, seleciona uma das suas peças.');
             break;
         case cell.classList.contains(`${currentPlayerColor}-piece`):
             await selectPiece(row, col, cell);
@@ -230,38 +241,31 @@ async function movePiece(row, col, cell) {
             await moveSelectedPiece(row, col, cell);
             break;
         default:
-            alert('Movimento proibido. Por favor, seleciona uma das células com a cor verde.');
+            setErrorMessage('Movimento proibido. Por favor, seleciona uma das células com a cor verde.');
     }
 }
 
 async function removePiece(row, col, color) {
     const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-    if(cell.classList.contains(`removable-piece`)) {
-        if(gameMode!=="modo-jogador-vs-computador"){
-            await notify(parseInt(row),parseInt(col));
-        }
+    if (cell.classList.contains(`removable-piece`)) {
         cell.classList.remove(`${color}-piece`);
+        clearHighlightedRemovablePieces();
+        await notifyServer(parseInt(row), parseInt(col));
         board[row][col] = "empty";
         isRemovePiecePhase = false;
         pieceRemoved[color] += 1;
-        clearHighlightedRemovablePieces();
-        if(gameMode==="modo-jogador-vs-computador" && isGameOver()) {
+        if (gameMode === "modo-jogador-vs-computador" && isGameOver()) {
             isMovementPhase = false;
             isPlacementPhase = false;
             isRemovePiecePhase = false;
-            setMessageContainer(`Fim de jogo! Vencedor: ${currentPlayerColor}`);
+            setErrorMessage(`Fim de jogo! Vencedor: ${currentPlayerColor}`);
             return;
         }
         currentPlayerColor = getOppositeColor(currentPlayerColor);
         updateLabels();
     } else {
-        alert('Movimento proibido. Por favor, selecione uma peça da cor do adversario.');
+        setErrorMessage('Movimento proibido. Por favor, selecione uma peça da cor do adversario.');
     }
-}
-
-function setMessageContainer(message) {
-    document.getElementById('message-fase').textContent = message;
-    document.getElementById('message-container').style.display = 'block';
 }
 
 function isGameOver() {
@@ -270,8 +274,7 @@ function isGameOver() {
         winner = currentPlayerColor;
         addClassificationToHTML(winner, gameMode);
         return true;
-    }
-    else if (!hasAvailableMoves(getOppositeColor(currentPlayerColor))) {
+    } else if (!hasAvailableMoves(getOppositeColor(currentPlayerColor))) {
         console.log('Game Over');
         winner = currentPlayerColor;
         addClassificationToHTML(winner, gameMode);
@@ -294,14 +297,12 @@ function addClassificationToHTML(winnerColor, gameMode) {
 }
 
 
-
-
 function hasAvailableMoves(playerColor) {
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-                if (board[row][col]==="empty" && isAdjacentToPieceOfColor(row, col, playerColor)) {
-                    return true;
-                }
+            if (board[row][col] === "empty" && isAdjacentToPieceOfColor(row, col, playerColor)) {
+                return true;
+            }
         }
     }
 }
@@ -327,12 +328,12 @@ async function selectPiece(row, col, cell) {
                 selectedCell.classList.remove('selected');
                 clearHighlightedEmptyAdjacent();
             } catch (error) {
-                selectedPiece = { row, col };
+                selectedPiece = {row, col};
                 cell.classList.add('selected');
                 highlightEmptyAdjacent(row, col);
             }
         }
-        selectedPiece = { row, col };
+        selectedPiece = {row, col};
         cell.classList.add('selected');
         highlightEmptyAdjacent(row, col);
     }
@@ -344,22 +345,22 @@ function canMovePiece(row, col) {
 }
 
 async function moveSelectedPiece(row, col, cell) {
+    if (gameMode !== "modo-jogador-vs-computador") {
+        await notifyServer(parseInt(selectedPiece.row), parseInt(selectedPiece.col));
+        await notifyServer(parseInt(row), parseInt(col));
+    }
     board[row][col] = currentPlayerColor;
     board[selectedPiece.row][selectedPiece.col] = "empty";
     const selectedCell = document.querySelector('.cell.selected');
     selectedCell.classList.remove('selected', `${currentPlayerColor.toLowerCase()}-piece`);
     cell.classList.add(`${currentPlayerColor.toLowerCase()}-piece`);
-    previousMove[currentPlayerColor] = { row: selectedPiece.row, col: selectedPiece.col };
-    if(gameMode!=="modo-jogador-vs-computador") {
-        await notify(parseInt(selectedPiece.row),parseInt(selectedPiece.col));
-        await notify(parseInt(row),parseInt(col));
-    }
+    previousMove[currentPlayerColor] = {row: selectedPiece.row, col: selectedPiece.col};
     selectedPiece = null;
     if (hasXInARowOrColumn(row, col, 3)) {
         isRemovePiecePhase = true;
         highlightRemovablePieces(getOppositeColor(currentPlayerColor));
     } else {
-        if(gameMode==="modo-jogador-vs-computador") switchPlayer();
+        if (gameMode === "modo-jogador-vs-computador") switchPlayer();
     }
     clearHighlightedEmptyAdjacent();
     updateLabels();
@@ -370,15 +371,14 @@ function getOppositeColor(color) {
 }
 
 function switchPlayer() {
-    if(gameMode==="modo-jogador-vs-computador"){
+    if (gameMode === "modo-jogador-vs-computador") {
         currentPlayerColor = getOppositeColor(currentPlayerColor);
     }
 }
 
 
-
 const RobotPlayer = {
-    placeRandom:async function(board) {
+    placeRandom: async function (board) {
         const emptyCells = findEmptyCells(board);
         if (emptyCells.length > 0) {
             let row, col;
@@ -392,8 +392,7 @@ const RobotPlayer = {
             const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
             await placePiece(row, col, cell);
         }
-    },
-    makeMove: async function(board) {
+    }, makeMove: async function (board) {
         const boardElement = document.getElementById('board');
         const cells = Array.from(boardElement.querySelectorAll('.cell'));
         shuffle(cells);
@@ -408,7 +407,7 @@ const RobotPlayer = {
                 if (availableMoves.length > 0) {
                     const randomIndex = Math.floor(Math.random() * availableMoves.length);
                     const randomCell = availableMoves[randomIndex];
-                    const { row, col } = randomCell.dataset;
+                    const {row, col} = randomCell.dataset;
                     await moveSelectedPiece(row, col, randomCell);
 
                     if (isRemovePiecePhase) {
@@ -420,8 +419,7 @@ const RobotPlayer = {
                 }
             }
         }
-    },
-    removeRandom: async function() {
+    }, removeRandom: async function () {
         const boardElement = document.getElementById('board');
         const cells = Array.from(boardElement.querySelectorAll('.cell.removable-piece'));
         if (cells.length > 0) {
@@ -448,8 +446,8 @@ function findEmptyCells(board) {
     const emptyCells = [];
     board.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
-            if (cell==="empty") {
-                emptyCells.push({ row: rowIndex, col: colIndex });
+            if (cell === "empty") {
+                emptyCells.push({row: rowIndex, col: colIndex});
             }
         });
     });
@@ -457,12 +455,12 @@ function findEmptyCells(board) {
 }
 
 async function cellClick(event) {
+    clearErrorMessage();
     const cell = event.target;
     if (cell.id === 'board' || cell.classList.contains('selected') || currentPlayerColor === computerColor && gameMode === "modo-jogador-vs-computador") {
         return;
-    } else if(turn!==nick && gameMode!=="modo-jogador-vs-computador"){
-        console.log(gameMode);
-        alert("Not your turn to play.");
+    } else if (turn !== nick && gameMode !== "modo-jogador-vs-computador") {
+        setErrorMessage("Not your turn to play.");
         return;
     }
     const row = cell.dataset.row;
@@ -500,12 +498,7 @@ async function handleComputerMove() {
 function highlightEmptyAdjacent(row, col) {
     const newboard = cloneBoard();
     board[row][col] = "empty";
-    const offsets = [
-        { row: -1, col: 0 },
-        { row: 1, col: 0 },
-        { row: 0, col: -1 },
-        { row: 0, col: 1 }
-    ];
+    const offsets = [{row: -1, col: 0}, {row: 1, col: 0}, {row: 0, col: -1}, {row: 0, col: 1}];
     for (const offset of offsets) {
         const newRow = parseInt(row) + offset.row;
         const newCol = parseInt(col) + offset.col;
@@ -515,7 +508,7 @@ function highlightEmptyAdjacent(row, col) {
         if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) {
             continue;
         }
-        if (board[newRow][newCol]!=="empty" || hasThreeInRowOrColumn(newRow, newCol)) {
+        if (board[newRow][newCol] !== "empty" || hasThreeInRowOrColumn(newRow, newCol)) {
             continue;
         }
         const cell = document.querySelector(`.cell[data-row='${newRow}'][data-col='${newCol}']`);
@@ -547,9 +540,9 @@ function clearHighlightedRemovablePieces() {
 
 function cloneBoard() {
     let newboard = [];
-    for(let i = 0; i < rows; i++) {
+    for (let i = 0; i < rows; i++) {
         newboard[i] = [];
-        for(let j = 0; j < cols; j++) {
+        for (let j = 0; j < cols; j++) {
             newboard[i][j] = board[i][j];
         }
     }

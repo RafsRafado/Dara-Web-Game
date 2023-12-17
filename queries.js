@@ -1,5 +1,5 @@
-//const SERVER = "http://twserver.alunos.dcc.fc.up.pt:8008/";
-const SERVER = "http://localhost:8008/";
+const SERVER = "http://twserver.alunos.dcc.fc.up.pt:8008/";
+//const SERVER = "http://localhost:8008/";
 const group = 25;
 let game;
 let nick;
@@ -144,7 +144,6 @@ function updateGameStatus(data) {
     }
 }
 
-
-async function notify(row, column){
+async function notifyServer(row, column){
     return await callServer("notify", {nick, password, game, "move": {"row": row, "column": column}});
 }

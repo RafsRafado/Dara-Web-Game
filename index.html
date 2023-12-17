@@ -39,22 +39,6 @@
 </div>
 
 <div class="game" style="display: none;">
-    <!-- Menssagem Fases -->
-    <div id="message-container">
-        <p id="message-fase">Fase de Colocação - Coloque suas peças.</p>
-    </div>
-
-
-
-    <!-- Mensagem Vitória -->
-    <section id="mensagem-vitoria" class="mensagem" style="display: none;">
-        <div class="mensagem-conteudo">
-            <p id="mensagem-texto">O jogador venceu!</p>
-            <button id="fechar-mensagem">Fechar</button>
-        </div>
-    </section>
-
-
     <!-- Tabuleiro -->
     <section id="tabuleiro">
         <h2>Tabuleiro</h2>
@@ -66,6 +50,9 @@
             <span id="black-count"></span>
             <span style="font-weight:bold;" for="white-count">White Pieces: </span>
             <span id="white-count"></span>
+        </div>
+        <div id="error-container">
+            <span id="error-message" class="error-message"></span>
         </div>
         <div id="board-container" class="board-container">
             <div id="board"></div>
@@ -156,7 +143,7 @@
 </section>
 
 
-<script src="communication.js"></script>
+<script src="queries.js"></script>
 <script src="script.js"></script>
 <script src="instrucoes.js"></script>
 <script src="game.js"></script>

@@ -44,13 +44,6 @@ fecharConfiguracoesButton.addEventListener('click', function () {
     document.body.style.overflow = "auto";
 });
 
-
-const fecharMensagemButton = document.getElementById('fechar-mensagem');
-fecharMensagemButton.addEventListener('click', function () {
-    const mensagemVitoria = document.getElementById('mensagem-vitoria');
-    mensagemVitoria.style.display = 'none';
-});
-
 document.getElementById('login-form').addEventListener('submit', async function (event) {
     event.preventDefault();
 
