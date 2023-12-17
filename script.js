@@ -73,7 +73,8 @@ const forfeitButton = document.getElementById('forfeit-button');
 forfeitButton.addEventListener('click', async function () {
     const confirmQuit = confirm("Confirmar desistência");
     if (confirmQuit) {
-        await leaveGame();
+        if(gameMode === "modo-jogador-vs-computador") saveGameResults("AI",nick);
+         else await leaveGame();
         changeScreen('.game','.menu-container');
     }
 });

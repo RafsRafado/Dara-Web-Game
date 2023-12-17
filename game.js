@@ -20,6 +20,28 @@ window.onload = function () {
     initGame();
 };
 
+
+function saveGameResults(winner, loser, rows, cols) {
+    let gameResults = JSON.parse(localStorage.getItem('gameResults')) || [];
+
+    function updateOrAddRecord(nick, isWinner) {
+        let record = gameResults.find(record => record.nick === nick && record.rows === rows && record.cols === cols);
+        if (record) {
+            if (isWinner) record.victories += 1;
+            record.games += 1;
+        } else {
+            gameResults.push({ nick, victories: isWinner ? 1 : 0, games: 1, rows, cols });
+        }
+    }
+
+    updateOrAddRecord(winner, true);
+    updateOrAddRecord(loser, false);
+
+    localStorage.setItem('gameResults', JSON.stringify(gameResults));
+}
+
+
+
 function setErrorMessage(message) {
     const messageLabel = document.getElementById('error-message');
     messageLabel.textContent=message;
@@ -66,8 +88,9 @@ function createBoard(rows, cols, func) {
 }
 
 function initGame() {
-    rows = parseInt(document.getElementById('linhas-tabuleiro').value);
-    cols = parseInt(document.getElementById('colunas-tabuleiro').value);
+    let size = sizes[document.getElementById("tamanho-tabuleiro").selectedIndex];
+    rows = size[0];
+    cols = size[1];
     gameMode = document.getElementById('modo-jogo').value;
     document.getElementById('game-mode').value = gameMode;
     currentPlayerColor = document.getElementById('primeiro-jogador').value === 'jogador1' ? 'black' : 'white';
@@ -88,7 +111,6 @@ function initGameFromAPI(boardData) {
     const rows = boardData.length;
     const cols = boardData[0].length;
     document.getElementById('back-button').style.display = 'none';
-    document.getElementById('reset-button').style.display = 'none';
     document.getElementById('forfeit-button').style.display = 'block';
     clearBoard();
 
@@ -155,6 +177,11 @@ function updateGameFromAPI(data) {
 
     if (data.turn) {
         updatePlayerTurn(data["turn"]);
+        const messageLabel = document.getElementById('message');
+        if(data["step"]==="take") messageLabel.textContent += " - Remover Peça";
+        else if(isPlacementPhase) messageLabel.textContent += " - Colocar Peça";
+        else if(isMovementPhase) messageLabel.textContent += " - Mover Peça";
+
     }
 }
 
@@ -250,7 +277,7 @@ async function removePiece(row, col, color) {
     if (cell.classList.contains(`removable-piece`)) {
         cell.classList.remove(`${color}-piece`);
         clearHighlightedRemovablePieces();
-        await notifyServer(parseInt(row), parseInt(col));
+        if (gameMode !== "modo-jogador-vs-computador") await notifyServer(parseInt(row), parseInt(col));
         board[row][col] = "empty";
         isRemovePiecePhase = false;
         pieceRemoved[color] += 1;
@@ -270,32 +297,23 @@ async function removePiece(row, col, color) {
 
 function isGameOver() {
     if (pieceRemoved.black >= maxPieceCount - 2 || pieceRemoved.white >= maxPieceCount - 2) {
-        console.log('Game Over');
-        winner = currentPlayerColor;
-        addClassificationToHTML(winner, gameMode);
+        handleWinner();
         return true;
     } else if (!hasAvailableMoves(getOppositeColor(currentPlayerColor))) {
-        console.log('Game Over');
-        winner = currentPlayerColor;
-        addClassificationToHTML(winner, gameMode);
+        handleWinner();
         return true;
     }
     return false;
 }
 
-function addClassificationToHTML(winnerColor, gameMode) {
-    const winnerType = winnerColor === computerColor ? 'Computador' : 'Jogador';
-    const tableBody = document.getElementById('classificacoes-tbody');
-    const row = tableBody.insertRow();
-    const cellGameMode = row.insertCell(0);
-    const cellWinner = row.insertCell(1);
-    const cellPlayerType = row.insertCell(2);
-    cellGameMode.textContent = gameMode;
-    cellWinner.textContent = winnerColor;
-    cellPlayerType.textContent = winnerType;
-    row.classList.add('classification-row');
+function handleWinner(){
+    console.log('Game Over');
+    winner = currentPlayerColor;
+    if(winner===initialPlayerColor) saveGameResults(nick,"AI",rows,cols);
+    else saveGameResults("AI",nick);
+    document.getElementById('forfeit-button').style.display='none';
+    document.getElementById('back-button').style.display='block';
 }
-
 
 function hasAvailableMoves(playerColor) {
     for (let row = 0; row < rows; row++) {

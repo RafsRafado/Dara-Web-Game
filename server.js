@@ -5,7 +5,7 @@ let corsConfig = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'OPTIONS, GET, POST, PUT, DELETE',
     'Access-Control-Allow-Headers': 'Accept, Content-Type',
-    'Access-Control-Expire': 10  // Time in seconds
+    'Access-Control-Expire': 100
 };
 
 let userAccounts = {};
@@ -30,26 +30,20 @@ function generateGameId(gameData) {
     return hashValue(gameIdentifier);
 }
 
-
 function handleUserRegistration(request, response) {
     let receivedData = '';
     request.on('data', chunk => {
         receivedData += chunk;
     }).on('end', () => {
         try {
-            // Parse the received data as JSON
             const userData = JSON.parse(receivedData);
             const username = userData.username;
             const password = userData.password;
 
-            // Perform registration logic
             if (username in userAccounts) {
-                // User already exists, handle accordingly
                 if (userAccounts[username] !== password) {
-                    // Existing user but password mismatch
                     sendErrorResponse(response, "User exists with a different password");
                 } else {
-                    // User re-registering with the same password
                     sendSuccessResponse(response, {});
                 }
             } else {
@@ -70,16 +64,13 @@ function handleGameJoin(request, response) {
         requestData += chunk;
     }).on('end', () => {
         try {
-            // Parse the request data
             const joinData = JSON.parse(requestData);
             const username = joinData.nick;
             const password = joinData.password;
-            const groupId = joinData.group; // Assuming this contains rows and columns
+            const groupId = joinData.group;
 
-            // Assuming a game ID is generated or retrieved
             const gameId = generateGameId(groupId);
 
-            // Sending back the game ID as a successful response
             sendSuccessResponse(response, { game: gameId });
         } catch (error) {
             console.error(error);
@@ -108,11 +99,6 @@ function handleGameLeave(request, response) {
     });
 }
 
-function generateOrRetrieveGameId(username, gameSize) {
-    return Math.floor(Math.random() * 10000);
-}
-
-// Create HTTP server
 const server = httpLib.createServer((request, response) => {
     if(request.method==='OPTIONS') {
         response.writeHead(200, corsConfig);

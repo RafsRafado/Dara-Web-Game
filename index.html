@@ -60,7 +60,6 @@
     </section>
 
     <div class="buttons">
-        <button type="button" id="reset-button">Reiniciar Jogo</button>
         <button type="button" id="forfeit-button" style="background-color:red">Desistir</button>
         <button type="button" id="back-button" style="display: none">Voltar ao menu</button>
     </div>
@@ -78,6 +77,19 @@
 <section id="classificacoes-fullscreen" class="overlay-classificacoes">
     <div class="panel">
         <div id="classificacoes-div">
+            <label for="modo-jogo-classif">Modo Jogo:</label>
+            <select id="modo-jogo-classif" style="padding:10px" onchange="ranking()">
+                <option value="0">Jogador x Jogador</option>
+                <option value="1">Jogador x AI</option>
+            </select>
+            <br>
+            <label for="tamanho-tabuleiro-classif">Tamanho Tabuleiro (rowsXcols):</label>
+            <select id="tamanho-tabuleiro-classif" style="padding:10px" onchange="ranking()">
+                <option value="0">6 X 5</option>
+                <option value="1">5 X 6</option>
+                <option value="2">6 X 6</option>
+                <option value="3">7 X 6</option>
+            </select>
             <table id="classificacoes-tabela">
                 <thead>
                 <tr>
@@ -99,16 +111,13 @@
         <div>
             <h2>Configurações</h2>
             <form id="config-form">
-                <label for="linhas-tabuleiro">Número de Linhas:</label>
-                <input type="number" id="linhas-tabuleiro" name="linhas-tabuleiro" min="2" max="20" value="6">
-
-                <br>
-
-                <label for="colunas-tabuleiro">Número de Colunas:</label>
-                <input type="number" id="colunas-tabuleiro" name="colunas-tabuleiro" min="2" max="20" value="5">
-
-                <br>
-
+                <label for="tamanho-tabuleiro">Tamanho Tabuleiro (rowsXcols):</label>
+                <select id="tamanho-tabuleiro">
+                    <option value="1">6 X 5</option>
+                    <option value="2">5 X 6</option>
+                    <option value="3">6 X 6</option>
+                    <option value="4">7 X 6</option>
+                </select>
                 <label for="modo-jogo">Modo de Jogo:</label>
                 <br><select id="modo-jogo" name="modo-jogo">
                     <option value="modo-jogador-vs-jogador">Jogador vs. Jogador</option>
@@ -131,9 +140,7 @@
                         <option value="dificil">Difícil</option>
                     </select>
                 </div>
-
                 <br>
-
                 <br>
             </form>
             <button type="button" id="apply-settings">Aplicar Configurações</button>

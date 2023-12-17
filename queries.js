@@ -4,6 +4,7 @@ const group = 25;
 let game;
 let nick;
 let password;
+let sizes =[[6,5],[5,6],[6,6],[7,6]];
 
 function getInputValue(id) {
     return document.getElementById(id).value;
@@ -41,18 +42,15 @@ async function registerUser() {
 }
 
 async function lookForGame() {
-    let rowsInput = parseInt(document.getElementById('linhas-tabuleiro').value);
-    let colsInput = parseInt(document.getElementById('colunas-tabuleiro').value);
+    let size = sizes[document.getElementById("tamanho-tabuleiro").selectedIndex];
+    let rowsInput = size[0];
+    let colsInput = size[1];
     let response_json = await callServer("join", {group, nick, password, "size":{"rows":rowsInput,"columns":colsInput}});
     if ("game" in response_json) {
-        console.log("Sucessfuly joined a game with ID: "+ response_json.game);
         game = response_json.game;
+        console.log("Joined game with ID:" + game);
         changeScreen('.menu-container','.waiting-page');
         await update();
-    }
-    else{
-        console.log("Join failed. Response:");
-        console.log(response_json);
     }
 }
 
@@ -87,20 +85,31 @@ function clearClassifications() {
 }
 
 async function ranking(){
-    let rows,cols;
-    rows = 6;
-    cols = 5;
-    let response_json = await callServer("ranking", {group, "size": {"rows":rows,"columns":cols}});
-    if (!("error" in response_json)){
-        console.log("Successfuly received the ranking table");
+    let rowsC,colsC;
+    let size = sizes[document.getElementById("tamanho-tabuleiro-classif").selectedIndex];
+    rowsC = size[0];
+    colsC = size[1];
+    if(document.getElementById("modo-jogo-classif").selectedIndex === 0) {
+        let response_json = await callServer("ranking", {group, "size": {"rows":rowsC,"columns":colsC}});
+        if (!("error" in response_json)){
+            console.log("Successfuly received the ranking table");
+            clearClassifications();
+            response_json["ranking"].forEach(row => insertRowInClassification(row));
+        }
+        else{
+            console.log("Ranking error. Response:");
+            console.log(response_json);
+        }
+    } else {
+        let gameResults = JSON.parse(localStorage.getItem('gameResults')) || [];
+        let filteredResults = gameResults.filter(result => result.rows === rowsC && result.cols === colsC);
+        filteredResults.sort((a, b) => b.victories - a.victories || b.games - a.games);
         clearClassifications();
-        response_json["ranking"].forEach(row => insertRowInClassification(row));
-    }
-    else{
-        console.log("Ranking error. Response:");
-        console.log(response_json);
+        filteredResults.forEach(row => insertRowInClassification(row));
     }
 }
+
+
 
 async function update() {
     const url = `${SERVER}update?nick=${encodeURIComponent(nick)}&game=${encodeURIComponent(game)}`;
@@ -109,11 +118,11 @@ async function update() {
         const eventSource = new EventSource(url);
 
         eventSource.onmessage = function(message) {
-            console.log("Successfully received an update from the server with data: " + message["data"]);
+            console.log("Received update from the server: " + message["data"]);
             data = JSON.parse(message["data"]);
 
             if (data["winner"]) {
-                console.log(`The game has ended and player ${data["winner"]} won`);
+                console.log(`The game ended and the player ${data["winner"]} won`);
                 handleGameOver(data["winner"]);
                 document.getElementById('forfeit-button').style.display='none';
                 document.getElementById('back-button').style.display='block';
@@ -124,11 +133,11 @@ async function update() {
         };
 
         eventSource.onerror = function(err) {
-            console.error("EventSource failed:", err);
+            console.log(err);
             eventSource.close();
         };
     } catch (error) {
-        console.error("An error occurred in the update function:", error);
+        console.error("An error occurred in the update:", error);
     }
 }
 
